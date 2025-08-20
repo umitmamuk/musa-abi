@@ -58,10 +58,10 @@ class _HomeScreenState extends State<HomeScreen> {
           // Header
           Container(
             padding: EdgeInsets.fromLTRB(
-              16, 
-              MediaQuery.of(context).padding.top + 8, 
-              16, 
-              16
+              12, 
+              MediaQuery.of(context).padding.top + 4, 
+              12, 
+              12
             ),
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -74,100 +74,106 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ],
             ),
-            child: Row(
-              children: [
-                // Arama Butonu (Sol)
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SearchScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.search, size: 26),
-                  color: AppColors.textPrimary,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-                
-                // Logo (Orta)
-                const Expanded(
-                  child: Center(
-                    child: AppLogo(size: 32),
+            child: SizedBox(
+              height: 56, // Header yüksekliğini sabitliyoruz
+              child: Row(
+                children: [
+                  // Arama Butonu (Sol)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SearchScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.search, size: 28),
+                    color: AppColors.textPrimary,
+                    padding: const EdgeInsets.all(8),
                   ),
-                ),
-                
-                // Sağ taraf butonlar
-                Row(
-                  children: [
-                    // Mesajlar
-                    Stack(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const MessagesScreen(),
+                  
+                  // Logo (Orta) - BÜYÜTÜLDÜ
+                  const Expanded(
+                    child: Center(
+                      child: AppLogo(
+                        size: 45,  // 32'den 45'e çıkarıldı
+                        showText: true,  // Text gösteriliyor
+                      ),
+                    ),
+                  ),
+                  
+                  // Sağ taraf butonlar
+                  Row(
+                    children: [
+                      // Mesajlar
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MessagesScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.message_outlined, size: 26),
+                            color: AppColors.textPrimary,
+                            padding: const EdgeInsets.all(8),
+                          ),
+                          Positioned(
+                            right: 6,
+                            top: 6,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1.5),
                               ),
-                            );
-                          },
-                          icon: const Icon(Icons.message_outlined, size: 24),
-                          color: AppColors.textPrimary,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(width: 12),
-                    // Bildirimler
-                    Stack(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Bildirimler açılıyor...'),
-                                backgroundColor: AppColors.primary,
+                        ],
+                      ),
+                      // Bildirimler
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Bildirimler açılıyor...'),
+                                  backgroundColor: AppColors.primary,
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.notifications_outlined, size: 26),
+                            color: AppColors.textPrimary,
+                            padding: const EdgeInsets.all(8),
+                          ),
+                          Positioned(
+                            right: 6,
+                            top: 6,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 1.5),
                               ),
-                            );
-                          },
-                          icon: const Icon(Icons.notifications_outlined, size: 24),
-                          color: AppColors.textPrimary,
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                        ),
-                        Positioned(
-                          right: 0,
-                          top: 0,
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           

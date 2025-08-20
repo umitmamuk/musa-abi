@@ -19,3 +19,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  
+  # Assets (Görseller)
+  assets:
+    - assets/images/
+    - assets/icons/
+    
+  # Alternatif: Tek tek dosya belirtme
+  # assets:
+  #   - assets/images/logo.png
+  #   - assets/images/logo_white.png
+  #   - assets/images/logo_mini.png
+  #   - assets/icons/app_icon.png
