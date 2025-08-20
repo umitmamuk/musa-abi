@@ -5,6 +5,7 @@ import '../categories/categories_screen.dart';
 import '../cart/cart_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../widgets/add_video_bottom_sheet.dart';
+import '../../widgets/app_logo.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -46,21 +47,25 @@ class _MainScreenState extends State<MainScreen> {
           selectedItemColor: AppColors.primary,
           unselectedItemColor: AppColors.textSecondary,
           elevation: 0,
-          items: const [
+          items: [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
+              icon: _currentIndex == 0 ? const AppLogoMini() : const Icon(Icons.home_outlined),
+              activeIcon: const AppLogoMini(),
               label: 'Ana Sayfa',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.category),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.category_outlined),
+              activeIcon: Icon(Icons.category),
               label: 'Kategoriler',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart_outlined),
+              activeIcon: Icon(Icons.shopping_cart),
               label: 'Sepet',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.person_outline),
+              activeIcon: Icon(Icons.person),
               label: 'Profil',
             ),
           ],
