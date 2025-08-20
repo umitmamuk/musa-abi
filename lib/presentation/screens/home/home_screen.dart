@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/product_video.dart';
+import '../../widgets/app_logo.dart';
+import '../search/search_screen.dart';
+import '../messages/messages_screen.dart';
 import 'widgets/video_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -54,65 +57,120 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Header
           Container(
-            padding: const EdgeInsets.fromLTRB(16, 50, 16, 16),
+            padding: EdgeInsets.fromLTRB(
+              16, 
+              MediaQuery.of(context).padding.top + 8, 
+              16, 
+              16
+            ),
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 5,
+                  offset: Offset(0, 2),
+                ),
+              ],
             ),
             child: Row(
               children: [
-                const Text(
-                  'Snapal',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Container(
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: const TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Ürün ara...',
-                        prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                // Arama Butonu (Sol)
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SearchScreen(),
                       ),
-                    ),
+                    );
+                  },
+                  icon: const Icon(Icons.search, size: 26),
+                  color: AppColors.textPrimary,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
+                
+                // Logo (Orta)
+                const Expanded(
+                  child: Center(
+                    child: AppLogo(size: 32),
                   ),
                 ),
-                const SizedBox(width: 16),
-                Stack(
+                
+                // Sağ taraf butonlar
+                Row(
                   children: [
-                    IconButton(
-                      onPressed: () {},
-                      icon: const Icon(Icons.notifications_outlined),
-                      color: AppColors.textPrimary,
-                    ),
-                    Positioned(
-                      right: 8,
-                      top: 8,
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: Colors.red,
-                          shape: BoxShape.circle,
+                    // Mesajlar
+                    Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const MessagesScreen(),
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.message_outlined, size: 24),
+                          color: AppColors.textPrimary,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
                         ),
-                      ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 12),
+                    // Bildirimler
+                    Stack(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Bildirimler açılıyor...'),
+                                backgroundColor: AppColors.primary,
+                              ),
+                            );
+                          },
+                          icon: const Icon(Icons.notifications_outlined, size: 24),
+                          color: AppColors.textPrimary,
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                        Positioned(
+                          right: 0,
+                          top: 0,
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.red,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ],
             ),
           ),
+          
           // Video Feed
           Expanded(
             child: PageView.builder(
