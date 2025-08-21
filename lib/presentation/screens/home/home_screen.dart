@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../data/models/product_video.dart';
 import '../../widgets/app_logo.dart';
 import '../search/search_screen.dart';
@@ -57,125 +56,126 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // Header
           Container(
-            padding: EdgeInsets.fromLTRB(
-              12, 
-              MediaQuery.of(context).padding.top + 4, 
-              12, 
-              12
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5,
-                  offset: Offset(0, 2),
+  padding: EdgeInsets.fromLTRB(
+    12, 
+    MediaQuery.of(context).padding.top + 4, 
+    12, 
+    12
+  ),
+  decoration: const BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black12,
+        blurRadius: 5,
+        offset: Offset(0, 2),
+      ),
+    ],
+  ),
+  child: SizedBox(
+    height: 56,
+    child: Row(
+      children: [
+        // Arama Butonu (Sol)
+        IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SearchScreen(),
+              ),
+            );
+          },
+          icon: const Icon(Icons.search, size: 28),
+          color: const Color(0xFF6366F1), // Logonuzun rengi
+          padding: const EdgeInsets.all(8),
+        ),
+        
+        // Logo (Orta) - TAM LOGONUZ
+        const Expanded(
+          child: Center(
+            child: AppLogoHeader(), // Tam logo kullanımı
+          ),
+        ),
+        
+        // Sağ taraf butonlar
+        Row(
+          children: [
+            // Mesajlar
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MessagesScreen(),
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.message_outlined, size: 26),
+                  color: const Color(0xFF6366F1),
+                  padding: const EdgeInsets.all(8),
+                ),
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xFF6366F1),
+                          Color(0xFF06B6D4),
+                        ],
+                      ),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 1.5),
+                    ),
+                  ),
                 ),
               ],
             ),
-            child: SizedBox(
-              height: 56, // Header yüksekliğini sabitliyoruz
-              child: Row(
-                children: [
-                  // Arama Butonu (Sol)
-                  IconButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SearchScreen(),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.search, size: 28),
-                    color: AppColors.textPrimary,
-                    padding: const EdgeInsets.all(8),
-                  ),
-                  
-                  // Logo (Orta) - BÜYÜTÜLDÜ
-                  const Expanded(
-                    child: Center(
-                      child: AppLogo(
-                        size: 45,  // 32'den 45'e çıkarıldı
-                        showText: true,  // Text gösteriliyor
+            // Bildirimler
+            Stack(
+              alignment: Alignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Bildirimler açılıyor...'),
+                        backgroundColor: Color(0xFF6366F1),
                       ),
+                    );
+                  },
+                  icon: const Icon(Icons.notifications_outlined, size: 26),
+                  color: const Color(0xFF6366F1),
+                  padding: const EdgeInsets.all(8),
+                ),
+                Positioned(
+                  right: 6,
+                  top: 6,
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
                     ),
                   ),
-                  
-                  // Sağ taraf butonlar
-                  Row(
-                    children: [
-                      // Mesajlar
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MessagesScreen(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.message_outlined, size: 26),
-                            color: AppColors.textPrimary,
-                            padding: const EdgeInsets.all(8),
-                          ),
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 1.5),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      // Bildirimler
-                      Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Bildirimler açılıyor...'),
-                                  backgroundColor: AppColors.primary,
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.notifications_outlined, size: 26),
-                            color: AppColors.textPrimary,
-                            padding: const EdgeInsets.all(8),
-                          ),
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 1.5),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
+          ],
+        ),
+      ],
+    ),
+  ),
+),
           
           // Video Feed
           Expanded(

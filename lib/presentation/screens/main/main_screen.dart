@@ -5,7 +5,6 @@ import '../categories/categories_screen.dart';
 import '../cart/cart_screen.dart';
 import '../profile/profile_screen.dart';
 import '../../widgets/add_video_bottom_sheet.dart';
-import '../../widgets/app_logo.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);

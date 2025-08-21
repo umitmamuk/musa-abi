@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../data/models/category.dart';
 
 class CategoryProductsScreen extends StatelessWidget {
   final category; // final Category category
