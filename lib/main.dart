@@ -10,14 +10,14 @@ void main() {
 }
 
 class SnapalApp extends StatelessWidget {
-  const SnapalApp({super.key});
+  const SnapalApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: MaterialApp(
         title: 'Snapal',

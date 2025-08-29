@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../providers/user_provider.dart';
+import '../seller/seller_panel_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -54,11 +55,11 @@ class ProfileScreen extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             radius: 40,
-                            backgroundColor: AppColors.primary,
+                            backgroundColor: AppColors.primary.withOpacity(0.1),
                             child: Text(
-                              user?.name.substring(0, 2).toUpperCase() ?? 'KK',
+                              user?.name.substring(0, 2).toUpperCase() ?? 'U',
                               style: const TextStyle(
-                                color: Colors.white,
+                                color: AppColors.primary,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -70,13 +71,14 @@ class ProfileScreen extends StatelessWidget {
                               bottom: 0,
                               child: Container(
                                 padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: AppColors.success,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
                                   shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
                                 ),
                                 child: const Icon(
                                   Icons.store,
-                                  size: 12,
+                                  size: 16,
                                   color: Colors.white,
                                 ),
                               ),
@@ -93,7 +95,7 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        '@${user?.username ?? 'kullanici'}',
+                        '@${user?.username ?? 'username'}',
                         style: const TextStyle(
                           color: AppColors.textSecondary,
                         ),
@@ -103,22 +105,22 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
+                            gradient: AppColors.getGradient(),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               const Icon(
-                                Icons.store,
+                                Icons.verified,
                                 size: 14,
-                                color: AppColors.primary,
+                                color: Colors.white,
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                user?.storeName ?? 'Mağaza',
+                                user?.storeName ?? 'Satıcı',
                                 style: const TextStyle(
-                                  color: AppColors.primary,
+                                  color: Colors.white,
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -127,6 +129,31 @@ class ProfileScreen extends StatelessWidget {
                           ),
                         ),
                       ],
+                      const SizedBox(height: 16),
+                      
+                      // Rol Değiştirme Butonu
+                      ElevatedButton.icon(
+                        onPressed: userProvider.isLoading 
+                            ? null 
+                            : () => _showRoleSwitchDialog(context, userProvider),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isSeller ? AppColors.warning : AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(25),
+                          ),
+                        ),
+                        icon: Icon(
+                          isSeller ? Icons.person : Icons.store,
+                          size: 20,
+                        ),
+                        label: Text(
+                          isSeller ? 'Müşteri Moduna Geç' : 'Satıcı Moduna Geç',
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      
                       const SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -143,80 +170,44 @@ class ProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
                 
-                // Kullanıcı Tipi Değiştirme
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.getGradient(
-                      colors: [
-                        AppColors.primary.withOpacity(0.1),
-                        AppColors.accent.withOpacity(0.1),
-                      ],
-                    ),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.primary.withOpacity(0.3),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        isSeller ? Icons.person : Icons.store,
-                        color: AppColors.primary,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isSeller ? 'Müşteri Moduna Geç' : 'Satıcı Ol',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              isSeller 
-                                ? 'Alışveriş yapmak için müşteri moduna geçin'
-                                : 'Ürünlerinizi satmaya başlayın',
-                              style: const TextStyle(
-                                color: AppColors.textSecondary,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Switch(
-                        value: isSeller,
-                        onChanged: userProvider.isLoading 
-                          ? null 
-                          : (value) => userProvider.switchUserType(),
-                        activeColor: AppColors.primary,
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 16),
-                
                 // Menü Seçenekleri
-                _buildMenuItem(
-                  icon: Icons.favorite_outline,
-                  title: 'Favorilerim',
-                  onTap: () {},
-                ),
-                _buildMenuItem(
-                  icon: Icons.shopping_bag_outlined,
-                  title: isSeller ? 'Satış Geçmişi' : 'Sipariş Geçmişi',
-                  onTap: () {},
-                ),
-                if (isSeller)
+                if (!isSeller) ...[
+                  _buildMenuItem(
+                    icon: Icons.favorite_outline,
+                    title: 'Favorilerim',
+                    onTap: () {},
+                  ),
+                  _buildMenuItem(
+                    icon: Icons.shopping_bag_outlined,
+                    title: 'Sipariş Geçmişi',
+                    onTap: () {},
+                  ),
+                ],
+                
+                if (isSeller) ...[
+                  _buildMenuItem(
+                    icon: Icons.dashboard_outlined,
+                    title: 'Satıcı Paneli',
+                    subtitle: 'Ürün ve sipariş yönetimi',
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SellerPanelScreen()),
+                    ),
+                  ),
                   _buildMenuItem(
                     icon: Icons.analytics_outlined,
                     title: 'İstatistikler',
+                    subtitle: 'Satış analizleri',
                     onTap: () {},
                   ),
+                  _buildMenuItem(
+                    icon: Icons.inventory_outlined,
+                    title: 'Ürünlerim',
+                    subtitle: '${user?.totalProducts ?? 0} ürün',
+                    onTap: () {},
+                  ),
+                ],
+                
                 _buildMenuItem(
                   icon: Icons.payment_outlined,
                   title: 'Ödeme Yöntemleri',
@@ -225,11 +216,6 @@ class ProfileScreen extends StatelessWidget {
                 _buildMenuItem(
                   icon: Icons.location_on_outlined,
                   title: 'Adreslerim',
-                  onTap: () {},
-                ),
-                _buildMenuItem(
-                  icon: Icons.notifications_outlined,
-                  title: 'Bildirim Ayarları',
                   onTap: () {},
                 ),
                 _buildMenuItem(
@@ -245,7 +231,7 @@ class ProfileScreen extends StatelessWidget {
                 _buildMenuItem(
                   icon: Icons.logout,
                   title: 'Çıkış Yap',
-                  onTap: () => _showLogoutDialog(context),
+                  onTap: () => userProvider.logout(),
                   isDestructive: true,
                 ),
               ],
@@ -257,17 +243,10 @@ class ProfileScreen extends StatelessWidget {
   }
 
   Widget _buildStatColumn(String label, String value) {
-    // Değeri formatla (1200 -> 1.2K)
-    String formattedValue = value;
-    final intValue = int.tryParse(value) ?? 0;
-    if (intValue >= 1000) {
-      formattedValue = '${(intValue / 1000).toStringAsFixed(1)}K';
-    }
-    
     return Column(
       children: [
         Text(
-          formattedValue,
+          value,
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -288,6 +267,7 @@ class ProfileScreen extends StatelessWidget {
   Widget _buildMenuItem({
     required IconData icon,
     required String title,
+    String? subtitle,
     required VoidCallback onTap,
     bool isDestructive = false,
   }) {
@@ -316,6 +296,15 @@ class ProfileScreen extends StatelessWidget {
             fontWeight: FontWeight.w500,
           ),
         ),
+        subtitle: subtitle != null 
+          ? Text(
+              subtitle,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
+            )
+          : null,
         trailing: const Icon(
           Icons.chevron_right,
           color: AppColors.textSecondary,
@@ -325,32 +314,61 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  void _showRoleSwitchDialog(BuildContext context, UserProvider userProvider) {
+    final isSeller = userProvider.isSeller;
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Çıkış Yap'),
-        content: const Text('Hesabınızdan çıkış yapmak istediğinize emin misiniz?'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            Icon(
+              isSeller ? Icons.person : Icons.store,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              isSeller ? 'Müşteri Moduna Geç' : 'Satıcı Moduna Geç',
+              style: const TextStyle(fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          isSeller 
+            ? 'Müşteri moduna geçmek istediğinize emin misiniz? Satıcı özelliklerine erişiminiz geçici olarak kapatılacak.'
+            : 'Satıcı moduna geçmek istediğinize emin misiniz? Ürün ekleme ve satış yapma özelliklerine erişebileceksiniz.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('İptal'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<UserProvider>().logout();
+              userProvider.switchUserType();
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Başarıyla çıkış yapıldı'),
+                SnackBar(
+                  content: Text(
+                    isSeller 
+                      ? 'Müşteri moduna geçildi' 
+                      : 'Satıcı moduna geçildi',
+                  ),
                   backgroundColor: AppColors.success,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
               );
             },
-            child: const Text(
-              'Çıkış Yap',
-              style: TextStyle(color: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
             ),
+            child: const Text('Değiştir'),
           ),
         ],
       ),
