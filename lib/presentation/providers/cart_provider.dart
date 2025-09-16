@@ -29,6 +29,8 @@ class CartProvider extends ChangeNotifier {
   
   double get total => subtotal + shipping;
 
+  get itemCount => null;
+
   void updateQuantity(String itemId, int newQuantity) {
     if (newQuantity <= 0) {
       removeFromCart(itemId);

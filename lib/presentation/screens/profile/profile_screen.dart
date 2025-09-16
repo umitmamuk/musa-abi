@@ -129,12 +129,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      _buildStatColumn('Takipçi', _formatNumber(followers)),
-                      Container(
-                        height: 40,
-                        width: 1,
-                        color: AppColors.border,
-                      ),
                       _buildStatColumn('Takip', _formatNumber(following)),
                       Container(
                         height: 40,

@@ -4,12 +4,17 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/product_video.dart';
 import '../../../../data/models/cart_item.dart';
 import '../../../providers/cart_provider.dart';
-import '../../product/product_detail_screen.dart';
+// import 'package:share_plus/share_plus.dart'; // pubspec.yaml'a eklenmeli
 
 class VideoCard extends StatefulWidget {
   final ProductVideo video;
+  final bool isPlaying;
 
-  const VideoCard({Key? key, required this.video}) : super(key: key);
+  const VideoCard({
+    Key? key, 
+    required this.video,
+    this.isPlaying = false,
+  }) : super(key: key);
 
   @override
   State<VideoCard> createState() => _VideoCardState();
@@ -17,16 +22,39 @@ class VideoCard extends StatefulWidget {
 
 class _VideoCardState extends State<VideoCard> {
   bool isLiked = false;
+  bool showDetails = true; // Ürün detaylarını göster/gizle
+
+  @override
+  void didUpdateWidget(VideoCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isPlaying && !oldWidget.isPlaying) {
+      // Video oynatmaya başla
+      _playVideo();
+    } else if (!widget.isPlaying && oldWidget.isPlaying) {
+      // Video oynatmayı durdur
+      _pauseVideo();
+    }
+  }
+
+  void _playVideo() {
+    // Video oynatma mantığı buraya gelecek
+    debugPrint('Video ${widget.video.id} oynatılıyor...');
+  }
+
+  void _pauseVideo() {
+    // Video duraklatma mantığı buraya gelecek
+    debugPrint('Video ${widget.video.id} duraklatıldı');
+  }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ProductDetailScreen(video: widget.video),
-        ),
-      ),
+      onTap: () {
+        // Tıklandığında detayları göster/gizle (video oynatmaya devam et)
+        setState(() {
+          showDetails = !showDetails;
+        });
+      },
       child: Container(
         width: double.infinity,
         height: double.infinity,
@@ -43,34 +71,32 @@ class _VideoCardState extends State<VideoCard> {
         ),
         child: Stack(
           children: [
-            // Video placeholder
+            // Video placeholder (Tam ekran)
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.play_circle_filled,
+                    widget.isPlaying ? Icons.play_circle_filled : Icons.pause_circle_filled,
                     size: 80,
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withOpacity(0.3),
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    widget.video.productName,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    widget.isPlaying ? 'Oynatılıyor...' : 'Duraklatıldı',
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.5),
+                      fontSize: 14,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
             ),
             
-            // Sağ taraf butonları
+            // Sağ taraf butonları (Her zaman görünür)
             Positioned(
-              right: 16,
-              bottom: 100,
+              right: 12,
+              bottom: 80,
               child: Column(
                 children: [
                   _buildActionButton(
@@ -79,19 +105,19 @@ class _VideoCardState extends State<VideoCard> {
                     onTap: () => setState(() => isLiked = !isLiked),
                     color: isLiked ? Colors.red : Colors.white,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   _buildActionButton(
                     icon: Icons.comment,
                     label: widget.video.comments.toString(),
                     onTap: () => _showCommentsBottomSheet(context),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   _buildActionButton(
                     icon: Icons.share,
                     label: 'Paylaş',
-                    onTap: () {},
+                    onTap: () => _shareProduct(),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   _buildActionButton(
                     icon: Icons.store,
                     label: 'Mağaza',
@@ -101,13 +127,14 @@ class _VideoCardState extends State<VideoCard> {
               ),
             ),
             
-            // Alt bilgi paneli
-            Positioned(
+            // Alt bilgi paneli (Göster/Gizle)
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 300),
               left: 0,
               right: 80,
-              bottom: 0,
+              bottom: showDetails ? 0 : -200,
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
@@ -126,7 +153,7 @@ class _VideoCardState extends State<VideoCard> {
                       widget.video.productName,
                       style: const TextStyle(
                         color: Colors.white,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -137,50 +164,59 @@ class _VideoCardState extends State<VideoCard> {
                           '₺${widget.video.price}',
                           style: const TextStyle(
                             color: AppColors.primary,
-                            fontSize: 18,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            widget.video.discount,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
+                        const SizedBox(width: 6),
+                        if (widget.video.discount != '0%')
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              widget.video.discount,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
                       ],
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
                     Text(
                       widget.video.description,
                       style: TextStyle(
                         color: Colors.white.withOpacity(0.8),
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 12),
-                    ElevatedButton(
-                      onPressed: () => _addToCart(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(25),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 32,
+                      child: ElevatedButton(
+                        onPressed: () => _addToCart(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
                         ),
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      ),
-                      child: const Text(
-                        'Sepete Ekle',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                        child: const Text(
+                          'Sepete Ekle',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -204,19 +240,19 @@ class _VideoCardState extends State<VideoCard> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.3),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 22),
           ),
           const SizedBox(height: 4),
           Text(
             label,
             style: const TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 11,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -228,7 +264,6 @@ class _VideoCardState extends State<VideoCard> {
   void _addToCart(BuildContext context) {
     final cartProvider = context.read<CartProvider>();
     
-    // CartItem oluştur
     final cartItem = CartItem(
       id: widget.video.id,
       productName: widget.video.productName,
@@ -244,7 +279,27 @@ class _VideoCardState extends State<VideoCard> {
         content: Text('${widget.video.productName} sepete eklendi!'),
         backgroundColor: AppColors.primary,
         behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 1),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _shareProduct() {
+    // Share Plus paketi ile paylaşım
+     final String() = '${widget.video.productName} - ₺${widget.video.price}\n'
+        '${widget.video.description}\n\n'
+        'Snapal uygulamasında keşfettim! 🛍️';
+    
+    // Share.share(shareText); // share_plus paketi eklendikten sonra
+    
+    // Geçici olarak SnackBar göster
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Paylaşılıyor: ${widget.video.productName}'),
+        backgroundColor: AppColors.info,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 1),
       ),
     );
   }
@@ -262,9 +317,19 @@ class _VideoCardState extends State<VideoCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Yorumlar',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Yorumlar',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: const Icon(Icons.close),
+                  padding: EdgeInsets.zero,
+                ),
+              ],
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -272,8 +337,14 @@ class _VideoCardState extends State<VideoCard> {
                 itemCount: 5,
                 itemBuilder: (context, index) => ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: AppColors.primary,
-                    child: Text('U${index + 1}'),
+                    backgroundColor: AppColors.primary.withOpacity(0.1),
+                    child: Text(
+                      'U${index + 1}',
+                      style: const TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                   ),
                   title: Text('Kullanıcı ${index + 1}'),
                   subtitle: const Text('Harika bir ürün! Çok beğendim.'),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/constants/app_colors.dart';
 import '../../../data/models/product_video.dart';
 import '../../widgets/app_logo.dart';
 import '../search/search_screen.dart';
@@ -14,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final PageController _pageController = PageController();
+  int currentVideoIndex = 0;
   
   final List<ProductVideo> videos = [
     ProductVideo(
@@ -49,143 +51,128 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Sayfa değişikliklerini dinle
+    _pageController.addListener(() {
+      int newIndex = _pageController.page?.round() ?? 0;
+      if (newIndex != currentVideoIndex) {
+        setState(() {
+          currentVideoIndex = newIndex;
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Column(
+      body: Stack(
         children: [
-          // Header
-          Container(
-  padding: EdgeInsets.fromLTRB(
-    12, 
-    MediaQuery.of(context).padding.top + 4, 
-    12, 
-    12
-  ),
-  decoration: const BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black12,
-        blurRadius: 5,
-        offset: Offset(0, 2),
-      ),
-    ],
-  ),
-  child: SizedBox(
-    height: 56,
-    child: Row(
-      children: [
-        // Arama Butonu (Sol)
-        IconButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SearchScreen(),
-              ),
-            );
-          },
-          icon: const Icon(Icons.search, size: 28),
-          color: const Color(0xFF6366F1), // Logonuzun rengi
-          padding: const EdgeInsets.all(8),
-        ),
-        
-        // Logo (Orta) - TAM LOGONUZ
-        const Expanded(
-          child: Center(
-            child: AppLogoHeader(), // Tam logo kullanımı
+          // Video Feed (Tam ekran)
+          PageView.builder(
+            controller: _pageController,
+            scrollDirection: Axis.vertical,
+            itemCount: videos.length,
+            itemBuilder: (context, index) {
+              return VideoCard(
+                video: videos[index],
+                isPlaying: index == currentVideoIndex, // Otomatik oynatma için
+              );
+            },
           ),
-        ),
-        
-        // Sağ taraf butonlar
-        Row(
-          children: [
-            // Mesajlar
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const MessagesScreen(),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.message_outlined, size: 26),
-                  color: const Color(0xFF6366F1),
-                  padding: const EdgeInsets.all(8),
-                ),
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFF6366F1),
-                          Color(0xFF06B6D4),
-                        ],
-                      ),
-                      shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 1.5),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            // Bildirimler
-            Stack(
-              alignment: Alignment.center,
-              children: [
-                IconButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Bildirimler açılıyor...'),
-                        backgroundColor: Color(0xFF6366F1),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.notifications_outlined, size: 26),
-                  color: const Color(0xFF6366F1),
-                  padding: const EdgeInsets.all(8),
-                ),
-                Positioned(
-                  right: 6,
-                  top: 6,
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    ),
-  ),
-),
           
-          // Video Feed
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.vertical,
-              itemCount: videos.length,
-              itemBuilder: (context, index) {
-                return VideoCard(video: videos[index]);
-              },
+          // Minimal Header (Üstte sabit)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(
+                12, 
+                MediaQuery.of(context).padding.top + 4, 
+                12, 
+                8
+              ),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withOpacity(0.6),
+                    Colors.transparent,
+                  ],
+                ),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Arama Butonu (Sol)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const SearchScreen(),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.search, size: 24),
+                    color: Colors.white,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minWidth: 40,
+                      minHeight: 40,
+                    ),
+                  ),
+                  
+                  // Logo (Orta) - Küçültüldü
+                  const AppLogoIcon(size: 28),
+                  
+                  // Mesajlar (Sağ)
+                  Stack(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const MessagesScreen(),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.message_outlined, size: 22),
+                        color: Colors.white,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 40,
+                          minHeight: 40,
+                        ),
+                      ),
+                      Positioned(
+                        right: 8,
+                        top: 8,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.black, width: 1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ],
